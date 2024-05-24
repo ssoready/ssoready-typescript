@@ -1,8 +1,8 @@
 {
-    "name": "",
-    "version": "0.0.1",
+    "name": "ssoready",
+    "version": "0.1.0",
     "private": false,
-    "repository": "https://github.com/fern-demo/ssoready-typescript",
+    "repository": "https://github.com/ssoready/ssoready-typescript",
     "main": "./index.js",
     "types": "./index.d.ts",
     "scripts": {
