@@ -1,6 +1,6 @@
 ## Saml
 
-<details><summary> <code>ssoReady.saml.<a href="./src/api/resources/saml/client/Client.ts">redeemAccessCode</a>({ ...params }) -> SSOReady.RedeemSamlAccessCodeResponse</code> </summary>
+<details><summary> <code>ssoReady.saml.<a href="./src/api/resources/saml/client/Client.ts">redeemSamlAccessCode</a>({ ...params }) -> SSOReady.RedeemSamlAccessCodeResponse</code> </summary>
 
 <dl>
 
@@ -37,8 +37,8 @@ Exchange a SAML access code for details about a SAML login.
 <dd>
 
 ```ts
-await ssoReady.saml.redeemAccessCode({
-    samlAccessCode: "saml_access_code_94d90b43a2027a9084bfc792",
+await ssoReady.saml.redeemSamlAccessCode({
+    samlAccessCode: "saml_access_code_...",
 });
 ```
 
@@ -85,7 +85,7 @@ await ssoReady.saml.redeemAccessCode({
 </dl>
 </details>
 
-<details><summary> <code>ssoReady.saml.<a href="./src/api/resources/saml/client/Client.ts">getRedirectUrl</a>({ ...params }) -> SSOReady.GetSamlRedirectUrlResponse</code> </summary>
+<details><summary> <code>ssoReady.saml.<a href="./src/api/resources/saml/client/Client.ts">getSamlRedirectUrl</a>({ ...params }) -> SSOReady.GetSamlRedirectUrlResponse</code> </summary>
 
 <dl>
 
@@ -122,9 +122,8 @@ Get a URL to initiate a SAML login.
 <dd>
 
 ```ts
-await ssoReady.saml.getRedirectUrl({
-    samlConnectionId: "saml_conn_ac3bzzoqhaa88ozk29hhv12l",
-    organizationId: "org_7cu5hsy9vrbi5d2k1qvbh19lj",
+await ssoReady.saml.getSamlRedirectUrl({
+    organizationExternalId: "my_custom_external_id",
 });
 ```
 
