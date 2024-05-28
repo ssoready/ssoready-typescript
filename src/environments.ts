@@ -3,7 +3,7 @@
  */
 
 export const SSOReadyEnvironment = {
-    Default: "https://api.dev-ucarion.ssoready-nonprod.com",
+    Default: "https://api.ssoready.com",
 } as const;
 
 export type SSOReadyEnvironment = typeof SSOReadyEnvironment.Default;

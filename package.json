@@ -1,8 +1,9 @@
 {
     "name": "ssoready",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "private": false,
     "repository": "https://github.com/ssoready/ssoready-typescript",
+    "license": "MIT",
     "main": "./index.js",
     "types": "./index.d.ts",
     "scripts": {
