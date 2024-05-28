@@ -1,8 +1,12 @@
-# SSOReady TypeScript Library
+# SSOReady-Typescript
 
-[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://buildwithfern.com/)
+`ssoready` is a Typescript/Node.js SDK for the [SSOReady](https://ssoready.com)
+API.
 
-The SSOReady TypeScript library provides convenient access to the SSOReady API from JavaScript/TypeScript.
+SSOReady is a set of open-source dev tools for implementing Enterprise SSO. You
+can use SSOReady to add SAML support to your product this afternoon, for free,
+forever. You can think of us as an open source alternative to products like
+Auth0 or WorkOS.
 
 ## Reference
 
@@ -18,120 +22,69 @@ yarn add ssoready
 
 ## Usage
 
+For full documentation, check out https://ssoready.com/docs.
+
+At a super high level, all it takes to add SAML to your product is to:
+
+1. Sign up on [app.ssoready.com](https://app.ssoready.com) for free
+2. From your login page, call `getSamlRedirectUrl` when you want a user to sign in with SAML
+3. Your user gets redirected back to a callback page you choose, e.g. `your-app.com/ssoready-callback?saml_access_code=...`. You
+   call `redeemSamlAccessCode` with the `saml_access_code` and log them in.
+
+Import and construct a SSOReady client like this:
+
 ```typescript
-import { SSOReadyClient, SSOReady } from 'ssoready';
-
-const ssoready = new SSOReady({
-  apiKey: "...", // Defaults to process.env.SSOREADY_API_KEY
-});
-
-await ssoread.saml.redeemAccessCode({
-    samlAccessCode: "saml_access_code_94d90b43a2027a9084bfc792"
-});
-```
-
-## Request and Response Types
-
-The SDK exports all request and response types as TypeScript interfaces. Simply 
-import them under the `SSOReady` namespace: 
-
-```ts
-import { SSOReady } from "ssoready"; 
-
-const request: SSOReady.RedeemSamlAccessCodeRequest = {
-  samlAccessCode: "saml_access_code_94d90b43a2027a9084bfc792"
-};
-```
-
-## Exception Handling
-
-When the API returns a non-success status code (4xx or 5xx response), 
-a subclass of [SSOReadyError](./src/errors/SSOReadyError.ts) will be thrown:
-
-```ts
-import { SSOReadyError } from 'ssoready';
-
-try {
-  await ssoready.saml.redeemAccessCode(...);
-} catch (err) {
-  if (err instanceof SSOReadyError) {
-    console.log(err.statusCode); 
-    console.log(err.message);
-    console.log(err.body); 
-  }
-}
-```
-
-## Retries
-
-The SDK is instrumented with automatic retries with exponential backoff. A request will be
-retried as long as the request is deemed retriable and the number of retry attempts has not grown larger
-than the configured retry limit (default: 2).
-
-A request is deemed retriable when any of the following HTTP status codes is returned:
-
-- [408](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) (Timeout)
-- [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) (Too Many Requests)
-- [5XX](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) (Internal Server Errors)
-  
-Use the `maxRetries` request option to configure this behavior. 
-
-```ts
-const response = await ssoready.saml.redeemAccessCode(..., {
-  maxRetries: 0 // override maxRetries at the request level
-});
-```
-
-## Timeouts
-
-The SDK defaults to a 60 second timout. Use the `timeoutInSeconds` option to 
-configure this behavior. 
-
-```ts
-const response = await ssoready.saml.redeemAccessCode(..., {
-  timeoutInSeconds: 30 // override timeout to 30s
-});
-```
-
-## Runtime compatiblity
-
-The SDK defaults to `node-fetch` but will use the global fetch client if present. The SDK 
-works in the following runtimes: 
-
-The following runtimes are supported:
-
-- Node.js 18+ 
-- Vercel 
-- Cloudflare Workers
-- Deno v1.25+
-- Bun 1.0+
-- React Native
-
-### Customizing Fetch client
-
-The SDK provides a way for you to customize the underlying HTTP client / Fetch function. If you're 
-running in an unsupported environment, this provides a way for you to break the glass and 
-ensure the SDK works. 
-
-```ts
 import { SSOReadyClient } from 'ssoready';
 
 const ssoready = new SSOReadyClient({
-  apiKey: "...",
-  fetcher: // provide your implementation here
+  apiKey: "ssoready_sk_...", // Defaults to process.env.SSOREADY_API_KEY
 });
 ```
 
-## Beta status
+Calling the `getSamlRedirectUrl` endpoint looks like this:
 
-This SDK is in beta, and there may be breaking changes between versions without a major version update. 
-Therefore, we recommend pinning the package version to a specific version in your package.json file. 
-This way, you can install the same version each time without breaking changes unless you are 
-intentionally looking for the latest version.
+```typescript
+// this is how you implement a "Sign in with SSO" button
+const { redirectUrl } = await ssoready.saml.getSamlRedirectUrl({
+  // the ID of the organization/workspace/team (whatever you call it)
+  // you want to log the user into
+  organizationExternalId: "..."
+});
+
+// redirect the user to `redirectUrl`...
+```
+
+And using `redeemSamlAccessCode` looks like this:
+
+```typescript
+// this goes in your handler for POST /ssoready-callback
+const { email, organizationExternalId } = await ssoready.saml.redeemSamlAccessCode({
+    samlAccessCode: "saml_access_code_..."
+});
+
+// log the user in as `email` inside `organizationExternalId`...
+```
+
+Check out [the quickstart](https://ssoready.com/docs) for the details spelled
+out more concretely. The whole point of SSOReady is to make enterprise SSO super
+obvious and easy.
+
+## Request and Response Types
+
+The SDK exports all request and response types as TypeScript interfaces. Simply
+import them under the `SSOReady` namespace:
+
+```ts
+import { SSOReady } from "ssoready";
+
+const request: SSOReady.RedeemSamlAccessCodeRequest = {
+  samlAccessCode: "saml_access_code_..."
+};
+```
 
 ## Contributing
 
-While we value open-source contributions to this SDK, this library is generated programmatically. 
-Additions made directly to this library would have to be moved over to our generation code, 
-otherwise they would be overwritten upon the next generated release. Feel free to open a 
-PR as a proof of concept, but know that we will not be able to merge it as-is. 
+Issues and PRs are more than welcome. Be advised that this library is largely
+autogenerated from
+[`ssoready/fern-config`](https://github.com/ssoready/fern-config). Most code
+changes ultimately need to be made there, not on this repo.
