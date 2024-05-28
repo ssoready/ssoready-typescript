@@ -5,7 +5,7 @@
 /**
  * @example
  *     {
- *         samlAccessCode: "saml_access_code_94d90b43a2027a9084bfc792"
+ *         samlAccessCode: "saml_access_code_..."
  *     }
  */
 export interface RedeemSamlAccessCodeRequest {

@@ -5,8 +5,7 @@
 /**
  * @example
  *     {
- *         samlConnectionId: "saml_conn_ac3bzzoqhaa88ozk29hhv12l",
- *         organizationId: "org_7cu5hsy9vrbi5d2k1qvbh19lj"
+ *         organizationExternalId: "my_custom_external_id"
  *     }
  */
 export interface GetSamlRedirectUrlRequest {
