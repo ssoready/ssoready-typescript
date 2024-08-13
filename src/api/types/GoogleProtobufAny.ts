@@ -3,8 +3,7 @@
  */
 
 /**
- * Contains an arbitrary serialized message along with a @type that describes the
- * type of the serialized message.
+ * Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
  */
 export interface GoogleProtobufAny {
     /** The type of the serialized message. */

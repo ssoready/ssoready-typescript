@@ -26,8 +26,6 @@ export class Saml {
     constructor(protected readonly _options: Saml.Options = {}) {}
 
     /**
-     * Exchange a SAML access code for details about a SAML login.
-     *
      * @param {SSOReady.RedeemSamlAccessCodeRequest} request
      * @param {Saml.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -50,7 +48,7 @@ export class Saml {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.0.0",
+                "X-Fern-SDK-Version": "1.0.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -94,8 +92,6 @@ export class Saml {
     }
 
     /**
-     * Get a URL to initiate a SAML login.
-     *
      * @param {SSOReady.GetSamlRedirectUrlRequest} request
      * @param {Saml.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -118,7 +114,7 @@ export class Saml {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.0.0",
+                "X-Fern-SDK-Version": "1.0.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

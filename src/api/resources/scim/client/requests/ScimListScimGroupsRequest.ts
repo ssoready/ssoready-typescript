@@ -8,9 +8,9 @@
  *         organizationExternalId: "my_custom_external_id"
  *     }
  */
-export interface GetSamlRedirectUrlRequest {
-    samlConnectionId?: string;
+export interface ScimListScimGroupsRequest {
+    scimDirectoryId?: string;
     organizationId?: string;
     organizationExternalId?: string;
-    state?: string;
+    pageToken?: string;
 }
