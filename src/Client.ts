@@ -5,6 +5,7 @@
 import * as environments from "./environments";
 import * as core from "./core";
 import { Saml } from "./api/resources/saml/client/Client";
+import { Scim } from "./api/resources/scim/client/Client";
 
 export declare namespace SSOReadyClient {
     interface Options {
@@ -26,5 +27,11 @@ export class SSOReadyClient {
 
     public get saml(): Saml {
         return (this._saml ??= new Saml(this._options));
+    }
+
+    protected _scim: Scim | undefined;
+
+    public get scim(): Scim {
+        return (this._scim ??= new Scim(this._options));
     }
 }

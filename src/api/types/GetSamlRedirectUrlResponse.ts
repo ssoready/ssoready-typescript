@@ -3,6 +3,5 @@
  */
 
 export interface GetSamlRedirectUrlResponse {
-    /** Redirect your user to this URL to initiate the SAML login. */
     redirectUrl?: string;
 }

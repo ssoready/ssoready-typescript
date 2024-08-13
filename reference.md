@@ -6,26 +6,6 @@
 
 <dd>
 
-#### 📝 Description
-
-<dl>
-
-<dd>
-
-<dl>
-
-<dd>
-
-Exchange a SAML access code for details about a SAML login.
-
-</dd>
-
-</dl>
-
-</dd>
-
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -91,26 +71,6 @@ await ssoReady.saml.redeemSamlAccessCode({
 
 <dd>
 
-#### 📝 Description
-
-<dl>
-
-<dd>
-
-<dl>
-
-<dd>
-
-Get a URL to initiate a SAML login.
-
-</dd>
-
-</dl>
-
-</dd>
-
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -156,6 +116,264 @@ await ssoReady.saml.getSamlRedirectUrl({
 <dd>
 
 **requestOptions: `Saml.RequestOptions`**
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+</details>
+
+## Scim
+
+<details><summary> <code>ssoReady.scim.<a href="./src/api/resources/scim/client/Client.ts">listScimGroups</a>({ ...params }) -> SSOReady.ListScimGroupsResponse</code> </summary>
+
+<dl>
+
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+```ts
+await ssoReady.scim.listScimGroups({
+    organizationExternalId: "my_custom_external_id",
+});
+```
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+**request: `SSOReady.ScimListScimGroupsRequest`**
+
+</dd>
+
+</dl>
+
+<dl>
+
+<dd>
+
+**requestOptions: `Scim.RequestOptions`**
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+</details>
+
+<details><summary> <code>ssoReady.scim.<a href="./src/api/resources/scim/client/Client.ts">getScimGroup</a>(id) -> SSOReady.GetScimGroupResponse</code> </summary>
+
+<dl>
+
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+```ts
+await ssoReady.scim.getScimGroup("scim_group_...");
+```
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+**id: `string`**
+
+</dd>
+
+</dl>
+
+<dl>
+
+<dd>
+
+**requestOptions: `Scim.RequestOptions`**
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+</details>
+
+<details><summary> <code>ssoReady.scim.<a href="./src/api/resources/scim/client/Client.ts">listScimUsers</a>({ ...params }) -> SSOReady.ListScimUsersResponse</code> </summary>
+
+<dl>
+
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+```ts
+await ssoReady.scim.listScimUsers({
+    organizationExternalId: "my_custom_external_id",
+});
+```
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+**request: `SSOReady.ScimListScimUsersRequest`**
+
+</dd>
+
+</dl>
+
+<dl>
+
+<dd>
+
+**requestOptions: `Scim.RequestOptions`**
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+</details>
+
+<details><summary> <code>ssoReady.scim.<a href="./src/api/resources/scim/client/Client.ts">getScimUser</a>(id) -> SSOReady.GetScimUserResponse</code> </summary>
+
+<dl>
+
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+```ts
+await ssoReady.scim.getScimUser("scim_user_...");
+```
+
+</dd>
+
+</dl>
+
+</dd>
+
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+
+<dd>
+
+<dl>
+
+<dd>
+
+**id: `string`**
+
+</dd>
+
+</dl>
+
+<dl>
+
+<dd>
+
+**requestOptions: `Scim.RequestOptions`**
 
 </dd>
 
