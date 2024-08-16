@@ -4,6 +4,7 @@
 
 import * as environments from "./environments";
 import * as core from "./core";
+import { Management } from "./api/resources/management/client/Client";
 import { Saml } from "./api/resources/saml/client/Client";
 import { Scim } from "./api/resources/scim/client/Client";
 
@@ -22,6 +23,12 @@ export declare namespace SSOReadyClient {
 
 export class SSOReadyClient {
     constructor(protected readonly _options: SSOReadyClient.Options = {}) {}
+
+    protected _management: Management | undefined;
+
+    public get management(): Management {
+        return (this._management ??= new Management(this._options));
+    }
 
     protected _saml: Saml | undefined;
 
