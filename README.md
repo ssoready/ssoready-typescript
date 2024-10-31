@@ -1,12 +1,17 @@
 # SSOReady-Typescript
 
+[![](https://img.shields.io/npm/v/ssoready)](https://www.npmjs.com/package/ssoready)
+
 `ssoready` is a Typescript/Node.js SDK for the [SSOReady](https://ssoready.com)
 API.
 
 SSOReady is a set of open-source dev tools for implementing Enterprise SSO. You
-can use SSOReady to add SAML support to your product this afternoon, for free,
-forever. You can think of us as an open source alternative to products like
-Auth0 or WorkOS.
+can use SSOReady to add SAML and SCIM support to your product this afternoon.
+
+For example applications built using SSOReady-TypeScript, check out:
+
+- [SSOReady Example App: Node + TypeScript + Express.js with SAML](https://github.com/ssoready/ssoready-example-app-node-typescript-express-saml)
+- [SSOReady Example App: Next.js + NextAuth](https://github.com/ssoready/ssoready-example-app-nextjs-nextauth-saml)
 
 ## Reference
 
@@ -22,28 +27,31 @@ yarn add ssoready
 
 ## Usage
 
-For full documentation, check out https://ssoready.com/docs.
+This section provides a high-level overview of how SSOReady works, and how it's
+possible to implement SAML and SCIM in just an afternoon. For a more thorough
+introduction, visit the [SAML
+quickstart](https://ssoready.com/docs/saml/saml-quickstart) or the [SCIM
+quickstart](https://ssoready.com/docs/scim/scim-quickstart).
 
-At a super high level, all it takes to add SAML to your product is to:
+The first thing you'll do is create a SSOReady client instance:
 
-1. Sign up on [app.ssoready.com](https://app.ssoready.com) for free
-2. From your login page, call `getSamlRedirectUrl` when you want a user to sign in with SAML
-3. Your user gets redirected back to a callback page you choose, e.g. `your-app.com/ssoready-callback?saml_access_code=...`. You
-   call `redeemSamlAccessCode` with the `saml_access_code` and log them in.
-
-Import and construct a SSOReady client like this:
-
-```typescript
+```ts
 import { SSOReadyClient } from 'ssoready';
 
-const ssoready = new SSOReadyClient({
-  apiKey: "ssoready_sk_...", // Defaults to process.env.SSOREADY_API_KEY
-});
+const ssoready = new SSOReadyClient(); // reads api key from env var SSOREADY_API_KEY
 ```
 
-Calling the `getSamlRedirectUrl` endpoint looks like this:
+### SAML in two lines of code
 
-```typescript
+SAML (aka "Enterprise SSO") consists of two steps: an _initiation_ step where
+you redirect your users to their corporate identity provider, and a _handling_
+step where you log them in once you know who they are.
+
+To initiate logins, you'll use SSOReady's [Get SAML Redirect
+URL](https://ssoready.com/docs/api-reference/saml/get-saml-redirect-url)
+endpoint:
+
+```ts
 // this is how you implement a "Sign in with SSO" button
 const { redirectUrl } = await ssoready.saml.getSamlRedirectUrl({
   // the ID of the organization/workspace/team (whatever you call it)
@@ -54,9 +62,15 @@ const { redirectUrl } = await ssoready.saml.getSamlRedirectUrl({
 // redirect the user to `redirectUrl`...
 ```
 
-And using `redeemSamlAccessCode` looks like this:
+You can use whatever your preferred ID is for organizations (you might call them
+"workspaces" or "teams") as your `organizationExternalId`. You configure those
+IDs inside SSOReady, and SSOReady handles keeping track of that organization's
+SAML and SCIM settings.
 
-```typescript
+To handle logins, you'll use SSOReady's [Redeem SAML Access
+Code](https://ssoready.com/docs/api-reference/saml/redeem-saml-access-code) endpoint:
+
+```ts
 // this goes in your handler for POST /ssoready-callback
 const { email, organizationExternalId } = await ssoready.saml.redeemSamlAccessCode({
     samlAccessCode: "saml_access_code_..."
@@ -65,26 +79,29 @@ const { email, organizationExternalId } = await ssoready.saml.redeemSamlAccessCo
 // log the user in as `email` inside `organizationExternalId`...
 ```
 
-Check out [the quickstart](https://ssoready.com/docs) for the details spelled
-out more concretely. The whole point of SSOReady is to make enterprise SSO super
-obvious and easy.
+You configure the URL for your `/ssoready-callback` endpoint in SSOReady.
 
-## Request and Response Types
+### SCIM in one line of code
 
-The SDK exports all request and response types as TypeScript interfaces. Simply
-import them under the `SSOReady` namespace:
+SCIM (aka "Enterprise directory sync") is basically a way for you to get a list
+of your customer's employees offline.
+
+To get a customer's employees, you'll use SSOReady's [List SCIM
+Users](https://ssoready.com/docs/api-reference/scim/list-scim-users) endpoint:
 
 ```ts
-import { SSOReady } from "ssoready";
+const { scimUsers, nextPageToken } = await ssoready.scim.listScimUsers({
+  organizationExternalId: "my_custom_external_id"
+});
 
-const request: SSOReady.RedeemSamlAccessCodeRequest = {
-  samlAccessCode: "saml_access_code_..."
-};
+// create users from each scimUser
+for (const { email, deleted, attributes } of scimUsers) {
+  // ...
+}
 ```
 
 ## Contributing
 
 Issues and PRs are more than welcome. Be advised that this library is largely
-autogenerated from
-[`ssoready/docs`](https://github.com/ssoready/docs). Most code
-changes ultimately need to be made there, not on this repo.
+autogenerated from [`ssoready/docs`](https://github.com/ssoready/docs). Most
+code changes ultimately need to be made there, not on this repo.
