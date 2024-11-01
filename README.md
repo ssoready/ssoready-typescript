@@ -1,4 +1,6 @@
-# SSOReady-Typescript
+![](https://i.imgur.com/OhtkhbJ.png)
+
+# SSOReady-Typescript: SAML & SCIM for Typescript
 
 [![](https://img.shields.io/npm/v/ssoready)](https://www.npmjs.com/package/ssoready)
 
