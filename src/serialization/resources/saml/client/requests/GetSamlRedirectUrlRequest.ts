@@ -17,7 +17,7 @@ export const GetSamlRedirectUrlRequest: core.serialization.Schema<
 });
 
 export declare namespace GetSamlRedirectUrlRequest {
-    interface Raw {
+    export interface Raw {
         samlConnectionId?: string | null;
         organizationId?: string | null;
         organizationExternalId?: string | null;

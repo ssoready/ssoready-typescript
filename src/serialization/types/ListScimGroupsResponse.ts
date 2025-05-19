@@ -16,7 +16,7 @@ export const ListScimGroupsResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace ListScimGroupsResponse {
-    interface Raw {
+    export interface Raw {
         scimGroups?: ScimGroup.Raw[] | null;
         nextPageToken?: string | null;
     }

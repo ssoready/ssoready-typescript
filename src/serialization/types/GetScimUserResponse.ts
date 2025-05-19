@@ -15,7 +15,7 @@ export const GetScimUserResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace GetScimUserResponse {
-    interface Raw {
+    export interface Raw {
         scimUser?: ScimUser.Raw | null;
     }
 }

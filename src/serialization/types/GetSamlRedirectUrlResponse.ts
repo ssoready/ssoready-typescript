@@ -14,7 +14,7 @@ export const GetSamlRedirectUrlResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace GetSamlRedirectUrlResponse {
-    interface Raw {
+    export interface Raw {
         redirectUrl?: string | null;
     }
 }

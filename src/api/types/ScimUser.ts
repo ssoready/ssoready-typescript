@@ -3,9 +3,19 @@
  */
 
 export interface ScimUser {
+    /** Unique identifier for this SCIM user. */
     id?: string;
+    /** SCIM directory this SCIM user belongs to. */
     scimDirectoryId?: string;
+    /** The SCIM user's email address. */
     email?: string;
+    /** Whether the SCIM user has been deleted or deprovisioned from its SCIM directory. */
     deleted?: boolean;
+    /**
+     * Arbitrary, potentially nested, attributes the Identity Provider included about the user.
+     *
+     *  Typically, these `attributes` are used to pass along the user's first/last name, or whether they should be
+     *  considered an admin within their company.
+     */
     attributes?: Record<string, unknown>;
 }

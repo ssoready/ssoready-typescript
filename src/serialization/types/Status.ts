@@ -15,7 +15,7 @@ export const Status: core.serialization.ObjectSchema<serializers.Status.Raw, SSO
     });
 
 export declare namespace Status {
-    interface Raw {
+    export interface Raw {
         code?: number | null;
         message?: string | null;
         details?: GoogleProtobufAny.Raw[] | null;

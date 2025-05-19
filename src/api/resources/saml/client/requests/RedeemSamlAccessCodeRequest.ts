@@ -9,5 +9,6 @@
  *     }
  */
 export interface RedeemSamlAccessCodeRequest {
+    /** The SAML access code to redeem. */
     samlAccessCode?: string;
 }

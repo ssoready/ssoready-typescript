@@ -10,15 +10,23 @@ import * as serializers from "../../../../../../serialization/index";
 import * as errors from "../../../../../../errors/index";
 
 export declare namespace SamlConnections {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.SSOReadyEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         apiKey?: core.Supplier<core.BearerToken | undefined>;
         fetcher?: core.FetchFunction;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -26,18 +34,27 @@ export class SamlConnections {
     constructor(protected readonly _options: SamlConnections.Options = {}) {}
 
     /**
+     * Lists SAML connections in an organization.
+     *
      * @param {SSOReady.management.SamlConnectionsListSamlConnectionsRequest} request
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.samlConnections.listSamlConnections()
+     *     await client.management.samlConnections.listSamlConnections()
      */
-    public async listSamlConnections(
+    public listSamlConnections(
         request: SSOReady.management.SamlConnectionsListSamlConnectionsRequest = {},
-        requestOptions?: SamlConnections.RequestOptions
-    ): Promise<SSOReady.ListSamlConnectionsResponse> {
+        requestOptions?: SamlConnections.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.ListSamlConnectionsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listSamlConnections(request, requestOptions));
+    }
+
+    private async __listSamlConnections(
+        request: SSOReady.management.SamlConnectionsListSamlConnectionsRequest = {},
+        requestOptions?: SamlConnections.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.ListSamlConnectionsResponse>> {
         const { organizationId, pageToken } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (organizationId != null) {
             _queryParams["organizationId"] = organizationId;
         }
@@ -48,37 +65,47 @@ export class SamlConnections {
 
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/saml-connections"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/saml-connections",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.ListSamlConnectionsResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.ListSamlConnectionsResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -87,60 +114,81 @@ export class SamlConnections {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/saml-connections.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
+     * Creates a SAML connection.
+     *
      * @param {SSOReady.SamlConnection} request
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.samlConnections.createSamlConnection({})
+     *     await client.management.samlConnections.createSamlConnection({})
      */
-    public async createSamlConnection(
+    public createSamlConnection(
         request: SSOReady.SamlConnection,
-        requestOptions?: SamlConnections.RequestOptions
-    ): Promise<SSOReady.CreateSamlConnectionResponse> {
+        requestOptions?: SamlConnections.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.CreateSamlConnectionResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__createSamlConnection(request, requestOptions));
+    }
+
+    private async __createSamlConnection(
+        request: SSOReady.SamlConnection,
+        requestOptions?: SamlConnections.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.CreateSamlConnectionResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/saml-connections"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/saml-connections",
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            body: await serializers.SamlConnection.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+            requestType: "json",
+            body: serializers.SamlConnection.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.CreateSamlConnectionResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.CreateSamlConnectionResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -149,59 +197,80 @@ export class SamlConnections {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling POST /v1/saml-connections.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Gets a SAML connection.
+     *
+     * @param {string} id - ID of the SAML connection to get.
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.samlConnections.getSamlConnection("id")
+     *     await client.management.samlConnections.getSamlConnection("id")
      */
-    public async getSamlConnection(
+    public getSamlConnection(
         id: string,
-        requestOptions?: SamlConnections.RequestOptions
-    ): Promise<SSOReady.GetSamlConnectionResponse> {
+        requestOptions?: SamlConnections.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.GetSamlConnectionResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__getSamlConnection(id, requestOptions));
+    }
+
+    private async __getSamlConnection(
+        id: string,
+        requestOptions?: SamlConnections.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.GetSamlConnectionResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/saml-connections/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/saml-connections/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.GetSamlConnectionResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.GetSamlConnectionResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -210,62 +279,84 @@ export class SamlConnections {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/saml-connections/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Updates a SAML connection.
+     *
+     * @param {string} id - The ID of the SAML connection to update.
      * @param {SSOReady.SamlConnection} request
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.samlConnections.updateSamlConnection("id", {})
+     *     await client.management.samlConnections.updateSamlConnection("id", {})
      */
-    public async updateSamlConnection(
+    public updateSamlConnection(
         id: string,
         request: SSOReady.SamlConnection,
-        requestOptions?: SamlConnections.RequestOptions
-    ): Promise<SSOReady.UpdateSamlConnectionResponse> {
+        requestOptions?: SamlConnections.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.UpdateSamlConnectionResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__updateSamlConnection(id, request, requestOptions));
+    }
+
+    private async __updateSamlConnection(
+        id: string,
+        request: SSOReady.SamlConnection,
+        requestOptions?: SamlConnections.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.UpdateSamlConnectionResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/saml-connections/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/saml-connections/${encodeURIComponent(id)}`,
             ),
             method: "PATCH",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            body: await serializers.SamlConnection.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+            requestType: "json",
+            body: serializers.SamlConnection.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.UpdateSamlConnectionResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.UpdateSamlConnectionResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -274,12 +365,14 @@ export class SamlConnections {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling PATCH /v1/saml-connections/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -288,7 +381,8 @@ export class SamlConnections {
         const bearer = (await core.Supplier.get(this._options.apiKey)) ?? process?.env["SSOREADY_API_KEY"];
         if (bearer == null) {
             throw new errors.SSOReadyError({
-                message: "Please specify SSOREADY_API_KEY when instantiating the client.",
+                message:
+                    "Please specify a bearer by either passing it in to the constructor or initializing a SSOREADY_API_KEY environment variable",
             });
         }
 

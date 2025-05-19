@@ -16,7 +16,7 @@ export const ListScimUsersResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace ListScimUsersResponse {
-    interface Raw {
+    export interface Raw {
         scimUsers?: ScimUser.Raw[] | null;
         nextPageToken?: string | null;
     }

@@ -8,4 +8,6 @@
 export interface GoogleProtobufAny {
     /** The type of the serialized message. */
     type?: string;
+    /** Accepts any additional properties */
+    [key: string]: any;
 }

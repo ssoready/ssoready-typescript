@@ -10,40 +10,34 @@ import { ScimDirectories } from "../resources/scimDirectories/client/Client";
 import { SetupUrls } from "../resources/setupUrls/client/Client";
 
 export declare namespace Management {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.SSOReadyEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         apiKey?: core.Supplier<core.BearerToken | undefined>;
         fetcher?: core.FetchFunction;
-    }
-
-    interface RequestOptions {
-        timeoutInSeconds?: number;
-        maxRetries?: number;
     }
 }
 
 export class Management {
-    constructor(protected readonly _options: Management.Options = {}) {}
-
     protected _organizations: Organizations | undefined;
+    protected _samlConnections: SamlConnections | undefined;
+    protected _scimDirectories: ScimDirectories | undefined;
+    protected _setupUrls: SetupUrls | undefined;
+
+    constructor(protected readonly _options: Management.Options = {}) {}
 
     public get organizations(): Organizations {
         return (this._organizations ??= new Organizations(this._options));
     }
 
-    protected _samlConnections: SamlConnections | undefined;
-
     public get samlConnections(): SamlConnections {
         return (this._samlConnections ??= new SamlConnections(this._options));
     }
 
-    protected _scimDirectories: ScimDirectories | undefined;
-
     public get scimDirectories(): ScimDirectories {
         return (this._scimDirectories ??= new ScimDirectories(this._options));
     }
-
-    protected _setupUrls: SetupUrls | undefined;
 
     public get setupUrls(): SetupUrls {
         return (this._setupUrls ??= new SetupUrls(this._options));

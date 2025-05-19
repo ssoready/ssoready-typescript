@@ -4,41 +4,47 @@
 
 import * as environments from "./environments";
 import * as core from "./core";
-import { Management } from "./api/resources/management/client/Client";
 import { Saml } from "./api/resources/saml/client/Client";
 import { Scim } from "./api/resources/scim/client/Client";
+import { Management } from "./api/resources/management/client/Client";
 
 export declare namespace SSOReadyClient {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.SSOReadyEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         apiKey?: core.Supplier<core.BearerToken | undefined>;
         fetcher?: core.FetchFunction;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
 export class SSOReadyClient {
-    constructor(protected readonly _options: SSOReadyClient.Options = {}) {}
-
+    protected _saml: Saml | undefined;
+    protected _scim: Scim | undefined;
     protected _management: Management | undefined;
 
-    public get management(): Management {
-        return (this._management ??= new Management(this._options));
-    }
-
-    protected _saml: Saml | undefined;
+    constructor(protected readonly _options: SSOReadyClient.Options = {}) {}
 
     public get saml(): Saml {
         return (this._saml ??= new Saml(this._options));
     }
 
-    protected _scim: Scim | undefined;
-
     public get scim(): Scim {
         return (this._scim ??= new Scim(this._options));
+    }
+
+    public get management(): Management {
+        return (this._management ??= new Management(this._options));
     }
 }

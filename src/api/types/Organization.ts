@@ -3,8 +3,25 @@
  */
 
 export interface Organization {
+    /** Unique identifier for this organization. */
     id?: string;
+    /** The environment this organization belongs to. */
     environmentId?: string;
+    /** An optional human-friendly name for this organization. */
+    displayName?: string;
+    /**
+     * An identifier you can attach to an organization. Meant to be used to correlate an SSOReady organization to your
+     *  internal equivalent concept.
+     *
+     *  External IDs are unique within an environment. No two organizations in the same environment can have
+     *  the same external ID.
+     */
     externalId?: string;
+    /**
+     * A list of domains that users from this organization use.
+     *
+     *  SAML connections and SCIM directories within this organization will only produce users whose email are included in
+     *  `domains`. SSOReady will reject SAML and SCIM users that do not fall within `domains`.
+     */
     domains?: string[];
 }

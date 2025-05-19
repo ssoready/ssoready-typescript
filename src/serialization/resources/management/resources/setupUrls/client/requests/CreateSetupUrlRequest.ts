@@ -16,7 +16,7 @@ export const CreateSetupUrlRequest: core.serialization.Schema<
 });
 
 export declare namespace CreateSetupUrlRequest {
-    interface Raw {
+    export interface Raw {
         organizationId?: string | null;
         canManageSaml?: boolean | null;
         canManageScim?: boolean | null;

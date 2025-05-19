@@ -19,7 +19,7 @@ export const RedeemSamlAccessCodeResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace RedeemSamlAccessCodeResponse {
-    interface Raw {
+    export interface Raw {
         email?: string | null;
         state?: string | null;
         attributes?: Record<string, string> | null;

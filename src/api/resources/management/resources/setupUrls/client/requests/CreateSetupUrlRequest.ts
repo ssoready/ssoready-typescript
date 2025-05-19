@@ -7,7 +7,10 @@
  *     {}
  */
 export interface CreateSetupUrlRequest {
+    /** The organization that the setup URL is for. */
     organizationId?: string;
+    /** Whether the setup URL lets the user manage SAML connections. */
     canManageSaml?: boolean;
+    /** Whether the setup URL lets the user manage SCIM directories. */
     canManageScim?: boolean;
 }

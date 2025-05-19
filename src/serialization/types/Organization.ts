@@ -10,14 +10,16 @@ export const Organization: core.serialization.ObjectSchema<serializers.Organizat
     core.serialization.object({
         id: core.serialization.string().optional(),
         environmentId: core.serialization.string().optional(),
+        displayName: core.serialization.string().optional(),
         externalId: core.serialization.string().optional(),
         domains: core.serialization.list(core.serialization.string()).optional(),
     });
 
 export declare namespace Organization {
-    interface Raw {
+    export interface Raw {
         id?: string | null;
         environmentId?: string | null;
+        displayName?: string | null;
         externalId?: string | null;
         domains?: string[] | null;
     }

@@ -16,7 +16,7 @@ export const ListOrganizationsResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace ListOrganizationsResponse {
-    interface Raw {
+    export interface Raw {
         organizations?: Organization.Raw[] | null;
         nextPageToken?: string | null;
     }

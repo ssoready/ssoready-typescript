@@ -16,7 +16,7 @@ export const ListSamlConnectionsResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace ListSamlConnectionsResponse {
-    interface Raw {
+    export interface Raw {
         samlConnections?: SamlConnection.Raw[] | null;
         nextPageToken?: string | null;
     }

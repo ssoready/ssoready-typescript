@@ -15,7 +15,7 @@ export const GetOrganizationResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace GetOrganizationResponse {
-    interface Raw {
+    export interface Raw {
         organization?: Organization.Raw | null;
     }
 }
