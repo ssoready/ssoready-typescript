@@ -3,12 +3,41 @@
  */
 
 export interface SamlConnection {
+    /** Unique identifier for this SAML connection. */
     id?: string;
+    /** The organization this SAML connection belongs to. */
     organizationId?: string;
+    /** Whether this is the primary SAML connection for the organization. */
     primary?: boolean;
+    /**
+     * URL to redirect to when initiating SAML flows.
+     *
+     * IDP redirect URLs are assigned by an Identity Provider, and need to be inputted into SSOReady.
+     */
     idpRedirectUrl?: string;
+    /**
+     * Certificate to authenticate SAML assertions. This is a PEM-encoded X.509 certificate.
+     *
+     * IDP certificates are assigned by an Identity Provider, and need to be inputted into SSOReady.
+     */
     idpCertificate?: string;
+    /**
+     * Identifier for the identity provider when handling SAML operations.
+     *
+     * IDP entity IDs are assigned by an Identity Provider, and need to be inputted into SSOReady.
+     */
     idpEntityId?: string;
+    /**
+     * Identifier for the SAML connection when handling SAML operations.
+     *
+     * SP entity IDs are assigned by SSOReady, and need to be inputted into your customer's Identity Provider.
+     */
     spEntityId?: string;
+    /**
+     * URL the Identity Provider redirects to when transmitting SAML assertions. Stands for "Service Provider Assertion
+     * Consumer Service" URL.
+     *
+     * SP ACS URLs are assigned by SSOReady, and need to be inputted into your customer's Identity Provider.
+     */
     spAcsUrl?: string;
 }

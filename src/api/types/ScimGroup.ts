@@ -3,9 +3,25 @@
  */
 
 export interface ScimGroup {
+    /** Unique identifier for this SCIM group. */
     id?: string;
+    /** SCIM directory this SCIM group belongs to. */
     scimDirectoryId?: string;
+    /** A human-friendly name for the SCIM group. */
     displayName?: string;
+    /**
+     * Whether the SCIM group has been deleted or deprovisioned from its SCIM directory.
+     *
+     * Identity Providers are inconsistent about reliably deleting SCIM groups. Many Identity Providers will deprovision
+     * the users inside a group, but not the group itself. For this reason, it's typical to ignore this field until a
+     * specific need arises.
+     */
     deleted?: boolean;
+    /**
+     * Arbitrary, potentially nested, attributes the Identity Provider included about the group.
+     *
+     * Identity Providers are inconsistent about supporting sending custom attributes on groups. For this reason, it's
+     * typical to not rely on them until a specific need arises.
+     */
     attributes?: Record<string, unknown>;
 }

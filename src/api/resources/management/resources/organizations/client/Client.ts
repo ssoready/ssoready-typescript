@@ -26,6 +26,8 @@ export class Organizations {
     constructor(protected readonly _options: Organizations.Options = {}) {}
 
     /**
+     * Gets a list of organizations.
+     *
      * @param {SSOReady.management.OrganizationsListOrganizationsRequest} request
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -52,7 +54,7 @@ export class Organizations {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -94,6 +96,8 @@ export class Organizations {
     }
 
     /**
+     * Creates an organization.
+     *
      * @param {SSOReady.Organization} request
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -114,7 +118,7 @@ export class Organizations {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -156,7 +160,9 @@ export class Organizations {
     }
 
     /**
-     * @param {string} id
+     * Gets an organization.
+     *
+     * @param {string} id - ID of the organization to get.
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
@@ -176,7 +182,7 @@ export class Organizations {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -217,7 +223,9 @@ export class Organizations {
     }
 
     /**
-     * @param {string} id
+     * Updates an organization.
+     *
+     * @param {string} id - ID of the organization to update.
      * @param {SSOReady.Organization} request
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -239,7 +247,7 @@ export class Organizations {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

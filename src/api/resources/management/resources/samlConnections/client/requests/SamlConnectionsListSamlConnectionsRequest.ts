@@ -7,6 +7,12 @@
  *     {}
  */
 export interface SamlConnectionsListSamlConnectionsRequest {
+    /**
+     * The organization the SAML connections belong to.
+     */
     organizationId?: string;
+    /**
+     * Pagination token. Leave empty to get the first page of results.
+     */
     pageToken?: string;
 }

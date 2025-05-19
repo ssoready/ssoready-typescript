@@ -5,5 +5,6 @@
 import * as SSOReady from "../index";
 
 export interface GetScimGroupResponse {
+    /** The requested SCIM group. */
     scimGroup?: SSOReady.ScimGroup;
 }

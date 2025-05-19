@@ -26,6 +26,8 @@ export class Scim {
     constructor(protected readonly _options: Scim.Options = {}) {}
 
     /**
+     * Gets a list of SCIM groups in a SCIM directory.
+     *
      * @param {SSOReady.ScimListScimGroupsRequest} request
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -66,7 +68,7 @@ export class Scim {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -108,7 +110,9 @@ export class Scim {
     }
 
     /**
-     * @param {string} id
+     * Gets a SCIM group in a SCIM directory.
+     *
+     * @param {string} id - ID of the SCIM group to get.
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
@@ -128,7 +132,7 @@ export class Scim {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -169,12 +173,20 @@ export class Scim {
     }
 
     /**
+     * Gets a list of SCIM users in a SCIM directory.
+     *
      * @param {SSOReady.ScimListScimUsersRequest} request
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
      *     await ssoReady.scim.listScimUsers({
      *         organizationExternalId: "my_custom_external_id"
+     *     })
+     *
+     * @example
+     *     await ssoReady.scim.listScimUsers({
+     *         organizationExternalId: "my_custom_external_id",
+     *         scimGroupId: "scim_group_..."
      *     })
      */
     public async listScimUsers(
@@ -213,7 +225,7 @@ export class Scim {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -255,7 +267,9 @@ export class Scim {
     }
 
     /**
-     * @param {string} id
+     * Gets a SCIM user.
+     *
+     * @param {string} id - ID of the SCIM user to get.
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
@@ -272,7 +286,7 @@ export class Scim {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

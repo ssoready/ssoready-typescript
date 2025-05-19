@@ -7,11 +7,38 @@
  *     {
  *         organizationExternalId: "my_custom_external_id"
  *     }
+ *
+ * @example
+ *     {
+ *         organizationExternalId: "my_custom_external_id",
+ *         scimGroupId: "scim_group_..."
+ *     }
  */
 export interface ScimListScimUsersRequest {
+    /**
+     * The SCIM directory to list from.
+     *
+     * One of `scimDirectoryId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     scimDirectoryId?: string;
+    /**
+     * The ID of the organization to list from. The primary SCIM directory of this organization is used.
+     *
+     * One of `scimDirectoryId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     organizationId?: string;
+    /**
+     * The `externalId` of the organization to list from. The primary SCIM directory of this organization is used.
+     *
+     * One of `scimDirectoryId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     organizationExternalId?: string;
+    /**
+     * If specified, only users that are members of this SCIM group are returned.
+     */
     scimGroupId?: string;
+    /**
+     * Pagination token. Leave empty to get the first page of results.
+     */
     pageToken?: string;
 }

@@ -26,6 +26,8 @@ export class ScimDirectories {
     constructor(protected readonly _options: ScimDirectories.Options = {}) {}
 
     /**
+     * Gets a list of SCIM directories in an organization.
+     *
      * @param {SSOReady.management.ScimDirectoriesListScimDirectoriesRequest} request
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -56,7 +58,7 @@ export class ScimDirectories {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -98,6 +100,8 @@ export class ScimDirectories {
     }
 
     /**
+     * Creates a SCIM directory.
+     *
      * @param {SSOReady.ScimDirectory} request
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -118,7 +122,7 @@ export class ScimDirectories {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -160,7 +164,9 @@ export class ScimDirectories {
     }
 
     /**
-     * @param {string} id
+     * Gets a SCIM directory.
+     *
+     * @param {string} id - The ID of the SCIM directory.
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
@@ -180,7 +186,7 @@ export class ScimDirectories {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -221,7 +227,9 @@ export class ScimDirectories {
     }
 
     /**
-     * @param {string} id
+     * Updates a SCIM directory.
+     *
+     * @param {string} id - The ID of the SCIM directory to update.
      * @param {SSOReady.ScimDirectory} request
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -243,7 +251,7 @@ export class ScimDirectories {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -285,7 +293,19 @@ export class ScimDirectories {
     }
 
     /**
-     * @param {string} id
+     * Rotates a SCIM directory's bearer token.
+     *
+     * Every SCIM directory has a bearer token that SSOReady uses to authenticate requests sent from your customer's
+     * Identity Provider. These bearer tokens are assigned by SSOReady, and are secret. Newly-created SCIM directories do
+     * not have any bearer token at all; you must use this endpoint to get an initial value.
+     *
+     * Rotating a SCIM directory bearer token immediately invalidates the previous bearer token, if any. Your customer
+     * will need to update their SCIM configuration with the new value to make SCIM syncing work again.
+     *
+     * SSOReady only stores the hash of these bearer tokens. If your customer has lost their copy, you must use this
+     * endpoint to generate a new one.
+     *
+     * @param {string} id - The ID of the SCIM directory whose bearer token to rotate.
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
@@ -305,7 +325,7 @@ export class ScimDirectories {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

@@ -5,5 +5,6 @@
 import * as SSOReady from "../index";
 
 export interface UpdateScimDirectoryResponse {
+    /** The updated SCIM directory. */
     scimDirectory?: SSOReady.ScimDirectory;
 }

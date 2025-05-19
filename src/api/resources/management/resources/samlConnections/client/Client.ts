@@ -26,6 +26,8 @@ export class SamlConnections {
     constructor(protected readonly _options: SamlConnections.Options = {}) {}
 
     /**
+     * Lists SAML connections in an organization.
+     *
      * @param {SSOReady.management.SamlConnectionsListSamlConnectionsRequest} request
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -56,7 +58,7 @@ export class SamlConnections {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -98,6 +100,8 @@ export class SamlConnections {
     }
 
     /**
+     * Creates a SAML connection.
+     *
      * @param {SSOReady.SamlConnection} request
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -118,7 +122,7 @@ export class SamlConnections {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -160,7 +164,9 @@ export class SamlConnections {
     }
 
     /**
-     * @param {string} id
+     * Gets a SAML connection.
+     *
+     * @param {string} id - ID of the SAML connection to get.
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
@@ -180,7 +186,7 @@ export class SamlConnections {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -221,7 +227,9 @@ export class SamlConnections {
     }
 
     /**
-     * @param {string} id
+     * Updates a SAML connection.
+     *
+     * @param {string} id - The ID of the SAML connection to update.
      * @param {SSOReady.SamlConnection} request
      * @param {SamlConnections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -243,7 +251,7 @@ export class SamlConnections {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

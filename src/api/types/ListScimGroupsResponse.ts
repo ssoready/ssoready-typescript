@@ -5,6 +5,8 @@
 import * as SSOReady from "../index";
 
 export interface ListScimGroupsResponse {
+    /** List of SCIM groups. */
     scimGroups?: SSOReady.ScimGroup[];
+    /** Value to use as `pageToken` for the next page of data. Empty if there is no more data. */
     nextPageToken?: string;
 }

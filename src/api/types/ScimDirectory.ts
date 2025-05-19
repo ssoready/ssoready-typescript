@@ -3,10 +3,23 @@
  */
 
 export interface ScimDirectory {
+    /** Unique identifier for this SCIM directory. */
     id?: string;
+    /** The organization this SCIM directory belongs to. */
     organizationId?: string;
+    /** Whether this is the primary SCIM directory for the organization. */
     primary?: boolean;
+    /**
+     * Base URL the Identity Provider uses to perform SCIM HTTP requests.
+     *
+     * SCIM base URLs are assigned by SSOReady, and need to be inputted into your customer's Identity Provider.
+     */
     scimBaseUrl?: string;
-    clientBearerToken?: string;
+    /**
+     * Whether this SCIM directory has a bearer token assigned.
+     *
+     * SSOReady only stores a hash of the bearer token. To get a bearer token value, you must rotate this SCIM directory's
+     * bearer token.
+     */
     hasClientBearerToken?: boolean;
 }

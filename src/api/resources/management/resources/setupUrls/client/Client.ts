@@ -26,6 +26,10 @@ export class SetupUrls {
     constructor(protected readonly _options: SetupUrls.Options = {}) {}
 
     /**
+     * Creates a short-lived self-serve setup URL that you can send to your customer.
+     *
+     * Setup URLs let your customer configure their SAML settings, SCIM settings, or both.
+     *
      * @param {SSOReady.management.CreateSetupUrlRequest} request
      * @param {SetupUrls.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -46,7 +50,7 @@ export class SetupUrls {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
