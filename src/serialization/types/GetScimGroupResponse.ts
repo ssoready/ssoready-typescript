@@ -15,7 +15,7 @@ export const GetScimGroupResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace GetScimGroupResponse {
-    interface Raw {
+    export interface Raw {
         scimGroup?: ScimGroup.Raw | null;
     }
 }

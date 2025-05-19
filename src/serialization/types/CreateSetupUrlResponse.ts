@@ -14,7 +14,7 @@ export const CreateSetupUrlResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace CreateSetupUrlResponse {
-    interface Raw {
+    export interface Raw {
         url?: string | null;
     }
 }

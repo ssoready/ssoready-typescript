@@ -3,5 +3,11 @@
  */
 
 export interface CreateSetupUrlResponse {
+    /**
+     * The one-time, short-lived self-serve setup URL.
+     *
+     *  Do not log or store this URL. Because this URL is one-time, loading it yourself means your customer will not be
+     *  able to load it after you.
+     */
     url?: string;
 }

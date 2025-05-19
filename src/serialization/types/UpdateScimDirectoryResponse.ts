@@ -15,7 +15,7 @@ export const UpdateScimDirectoryResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace UpdateScimDirectoryResponse {
-    interface Raw {
+    export interface Raw {
         scimDirectory?: ScimDirectory.Raw | null;
     }
 }

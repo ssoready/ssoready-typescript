@@ -5,5 +5,6 @@
 import * as SSOReady from "../index";
 
 export interface CreateOrganizationResponse {
+    /** The created organization. */
     organization?: SSOReady.Organization;
 }

@@ -5,5 +5,6 @@
 import * as SSOReady from "../index";
 
 export interface GetScimUserResponse {
+    /** The requested SCIM user. */
     scimUser?: SSOReady.ScimUser;
 }

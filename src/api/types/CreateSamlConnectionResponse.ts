@@ -5,5 +5,6 @@
 import * as SSOReady from "../index";
 
 export interface CreateSamlConnectionResponse {
+    /** The created SAML connection. */
     samlConnection?: SSOReady.SamlConnection;
 }

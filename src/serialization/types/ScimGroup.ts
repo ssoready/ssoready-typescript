@@ -16,7 +16,7 @@ export const ScimGroup: core.serialization.ObjectSchema<serializers.ScimGroup.Ra
     });
 
 export declare namespace ScimGroup {
-    interface Raw {
+    export interface Raw {
         id?: string | null;
         scimDirectoryId?: string | null;
         displayName?: string | null;

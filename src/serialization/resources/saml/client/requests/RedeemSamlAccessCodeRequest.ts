@@ -14,7 +14,7 @@ export const RedeemSamlAccessCodeRequest: core.serialization.Schema<
 });
 
 export declare namespace RedeemSamlAccessCodeRequest {
-    interface Raw {
+    export interface Raw {
         samlAccessCode?: string | null;
     }
 }

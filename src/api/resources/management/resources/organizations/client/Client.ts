@@ -10,15 +10,23 @@ import * as serializers from "../../../../../../serialization/index";
 import * as errors from "../../../../../../errors/index";
 
 export declare namespace Organizations {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.SSOReadyEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         apiKey?: core.Supplier<core.BearerToken | undefined>;
         fetcher?: core.FetchFunction;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -26,55 +34,74 @@ export class Organizations {
     constructor(protected readonly _options: Organizations.Options = {}) {}
 
     /**
+     * Gets a list of organizations.
+     *
      * @param {SSOReady.management.OrganizationsListOrganizationsRequest} request
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.organizations.listOrganizations()
+     *     await client.management.organizations.listOrganizations()
      */
-    public async listOrganizations(
+    public listOrganizations(
         request: SSOReady.management.OrganizationsListOrganizationsRequest = {},
-        requestOptions?: Organizations.RequestOptions
-    ): Promise<SSOReady.ListOrganizationsResponse> {
+        requestOptions?: Organizations.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.ListOrganizationsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listOrganizations(request, requestOptions));
+    }
+
+    private async __listOrganizations(
+        request: SSOReady.management.OrganizationsListOrganizationsRequest = {},
+        requestOptions?: Organizations.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.ListOrganizationsResponse>> {
         const { pageToken } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (pageToken != null) {
             _queryParams["pageToken"] = pageToken;
         }
 
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/organizations"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/organizations",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.ListOrganizationsResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.ListOrganizationsResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -83,60 +110,81 @@ export class Organizations {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/organizations.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
+     * Creates an organization.
+     *
      * @param {SSOReady.Organization} request
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.organizations.createOrganization({})
+     *     await client.management.organizations.createOrganization({})
      */
-    public async createOrganization(
+    public createOrganization(
         request: SSOReady.Organization,
-        requestOptions?: Organizations.RequestOptions
-    ): Promise<SSOReady.CreateOrganizationResponse> {
+        requestOptions?: Organizations.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.CreateOrganizationResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__createOrganization(request, requestOptions));
+    }
+
+    private async __createOrganization(
+        request: SSOReady.Organization,
+        requestOptions?: Organizations.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.CreateOrganizationResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/organizations"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/organizations",
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            body: await serializers.Organization.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+            requestType: "json",
+            body: serializers.Organization.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.CreateOrganizationResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.CreateOrganizationResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -145,59 +193,80 @@ export class Organizations {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling POST /v1/organizations.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Gets an organization.
+     *
+     * @param {string} id - ID of the organization to get.
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.organizations.getOrganization("id")
+     *     await client.management.organizations.getOrganization("id")
      */
-    public async getOrganization(
+    public getOrganization(
         id: string,
-        requestOptions?: Organizations.RequestOptions
-    ): Promise<SSOReady.GetOrganizationResponse> {
+        requestOptions?: Organizations.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.GetOrganizationResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__getOrganization(id, requestOptions));
+    }
+
+    private async __getOrganization(
+        id: string,
+        requestOptions?: Organizations.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.GetOrganizationResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/organizations/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/organizations/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.GetOrganizationResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.GetOrganizationResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -206,62 +275,84 @@ export class Organizations {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/organizations/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Updates an organization.
+     *
+     * @param {string} id - ID of the organization to update.
      * @param {SSOReady.Organization} request
      * @param {Organizations.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.organizations.updateOrganization("id", {})
+     *     await client.management.organizations.updateOrganization("id", {})
      */
-    public async updateOrganization(
+    public updateOrganization(
         id: string,
         request: SSOReady.Organization,
-        requestOptions?: Organizations.RequestOptions
-    ): Promise<SSOReady.UpdateOrganizationResponse> {
+        requestOptions?: Organizations.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.UpdateOrganizationResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__updateOrganization(id, request, requestOptions));
+    }
+
+    private async __updateOrganization(
+        id: string,
+        request: SSOReady.Organization,
+        requestOptions?: Organizations.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.UpdateOrganizationResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/organizations/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/organizations/${encodeURIComponent(id)}`,
             ),
             method: "PATCH",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            body: await serializers.Organization.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+            requestType: "json",
+            body: serializers.Organization.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.UpdateOrganizationResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.UpdateOrganizationResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -270,12 +361,14 @@ export class Organizations {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling PATCH /v1/organizations/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -284,7 +377,8 @@ export class Organizations {
         const bearer = (await core.Supplier.get(this._options.apiKey)) ?? process?.env["SSOREADY_API_KEY"];
         if (bearer == null) {
             throw new errors.SSOReadyError({
-                message: "Please specify SSOREADY_API_KEY when instantiating the client.",
+                message:
+                    "Please specify a bearer by either passing it in to the constructor or initializing a SSOREADY_API_KEY environment variable",
             });
         }
 

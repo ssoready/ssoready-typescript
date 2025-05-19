@@ -10,15 +10,23 @@ import * as serializers from "../../../../serialization/index";
 import * as errors from "../../../../errors/index";
 
 export declare namespace Scim {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.SSOReadyEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         apiKey?: core.Supplier<core.BearerToken | undefined>;
         fetcher?: core.FetchFunction;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -26,20 +34,29 @@ export class Scim {
     constructor(protected readonly _options: Scim.Options = {}) {}
 
     /**
+     * Gets a list of SCIM groups in a SCIM directory.
+     *
      * @param {SSOReady.ScimListScimGroupsRequest} request
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.scim.listScimGroups({
+     *     await client.scim.listScimGroups({
      *         organizationExternalId: "my_custom_external_id"
      *     })
      */
-    public async listScimGroups(
+    public listScimGroups(
         request: SSOReady.ScimListScimGroupsRequest = {},
-        requestOptions?: Scim.RequestOptions
-    ): Promise<SSOReady.ListScimGroupsResponse> {
+        requestOptions?: Scim.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.ListScimGroupsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listScimGroups(request, requestOptions));
+    }
+
+    private async __listScimGroups(
+        request: SSOReady.ScimListScimGroupsRequest = {},
+        requestOptions?: Scim.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.ListScimGroupsResponse>> {
         const { scimDirectoryId, organizationId, organizationExternalId, pageToken } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (scimDirectoryId != null) {
             _queryParams["scimDirectoryId"] = scimDirectoryId;
         }
@@ -58,37 +75,47 @@ export class Scim {
 
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/scim/groups"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/scim/groups",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.ListScimGroupsResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.ListScimGroupsResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -97,59 +124,80 @@ export class Scim {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/scim/groups.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Gets a SCIM group in a SCIM directory.
+     *
+     * @param {string} id - ID of the SCIM group to get.
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.scim.getScimGroup("scim_group_...")
+     *     await client.scim.getScimGroup("scim_group_...")
      */
-    public async getScimGroup(
+    public getScimGroup(
         id: string,
-        requestOptions?: Scim.RequestOptions
-    ): Promise<SSOReady.GetScimGroupResponse> {
+        requestOptions?: Scim.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.GetScimGroupResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__getScimGroup(id, requestOptions));
+    }
+
+    private async __getScimGroup(
+        id: string,
+        requestOptions?: Scim.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.GetScimGroupResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/scim/groups/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/scim/groups/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.GetScimGroupResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.GetScimGroupResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -158,31 +206,48 @@ export class Scim {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/scim/groups/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
+     * Gets a list of SCIM users in a SCIM directory.
+     *
      * @param {SSOReady.ScimListScimUsersRequest} request
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.scim.listScimUsers({
+     *     await client.scim.listScimUsers({
      *         organizationExternalId: "my_custom_external_id"
      *     })
+     *
+     * @example
+     *     await client.scim.listScimUsers({
+     *         organizationExternalId: "my_custom_external_id",
+     *         scimGroupId: "scim_group_..."
+     *     })
      */
-    public async listScimUsers(
+    public listScimUsers(
         request: SSOReady.ScimListScimUsersRequest = {},
-        requestOptions?: Scim.RequestOptions
-    ): Promise<SSOReady.ListScimUsersResponse> {
+        requestOptions?: Scim.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.ListScimUsersResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listScimUsers(request, requestOptions));
+    }
+
+    private async __listScimUsers(
+        request: SSOReady.ScimListScimUsersRequest = {},
+        requestOptions?: Scim.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.ListScimUsersResponse>> {
         const { scimDirectoryId, organizationId, organizationExternalId, scimGroupId, pageToken } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (scimDirectoryId != null) {
             _queryParams["scimDirectoryId"] = scimDirectoryId;
         }
@@ -205,37 +270,47 @@ export class Scim {
 
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/scim/users"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/scim/users",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.ListScimUsersResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.ListScimUsersResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -244,56 +319,80 @@ export class Scim {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/scim/users.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Gets a SCIM user.
+     *
+     * @param {string} id - ID of the SCIM user to get.
      * @param {Scim.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.scim.getScimUser("scim_user_...")
+     *     await client.scim.getScimUser("scim_user_...")
      */
-    public async getScimUser(id: string, requestOptions?: Scim.RequestOptions): Promise<SSOReady.GetScimUserResponse> {
+    public getScimUser(
+        id: string,
+        requestOptions?: Scim.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.GetScimUserResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__getScimUser(id, requestOptions));
+    }
+
+    private async __getScimUser(
+        id: string,
+        requestOptions?: Scim.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.GetScimUserResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/scim/users/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/scim/users/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.GetScimUserResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.GetScimUserResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -302,12 +401,14 @@ export class Scim {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/scim/users/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -316,7 +417,8 @@ export class Scim {
         const bearer = (await core.Supplier.get(this._options.apiKey)) ?? process?.env["SSOREADY_API_KEY"];
         if (bearer == null) {
             throw new errors.SSOReadyError({
-                message: "Please specify SSOREADY_API_KEY when instantiating the client.",
+                message:
+                    "Please specify a bearer by either passing it in to the constructor or initializing a SSOREADY_API_KEY environment variable",
             });
         }
 

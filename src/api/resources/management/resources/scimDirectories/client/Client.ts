@@ -10,15 +10,23 @@ import * as serializers from "../../../../../../serialization/index";
 import * as errors from "../../../../../../errors/index";
 
 export declare namespace ScimDirectories {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.SSOReadyEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         apiKey?: core.Supplier<core.BearerToken | undefined>;
         fetcher?: core.FetchFunction;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -26,18 +34,27 @@ export class ScimDirectories {
     constructor(protected readonly _options: ScimDirectories.Options = {}) {}
 
     /**
+     * Gets a list of SCIM directories in an organization.
+     *
      * @param {SSOReady.management.ScimDirectoriesListScimDirectoriesRequest} request
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.scimDirectories.listScimDirectories()
+     *     await client.management.scimDirectories.listScimDirectories()
      */
-    public async listScimDirectories(
+    public listScimDirectories(
         request: SSOReady.management.ScimDirectoriesListScimDirectoriesRequest = {},
-        requestOptions?: ScimDirectories.RequestOptions
-    ): Promise<SSOReady.ListScimDirectoriesResponse> {
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.ListScimDirectoriesResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listScimDirectories(request, requestOptions));
+    }
+
+    private async __listScimDirectories(
+        request: SSOReady.management.ScimDirectoriesListScimDirectoriesRequest = {},
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.ListScimDirectoriesResponse>> {
         const { organizationId, pageToken } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (organizationId != null) {
             _queryParams["organizationId"] = organizationId;
         }
@@ -48,37 +65,47 @@ export class ScimDirectories {
 
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/scim-directories"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/scim-directories",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.ListScimDirectoriesResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.ListScimDirectoriesResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -87,60 +114,81 @@ export class ScimDirectories {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/scim-directories.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
+     * Creates a SCIM directory.
+     *
      * @param {SSOReady.ScimDirectory} request
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.scimDirectories.createScimDirectory({})
+     *     await client.management.scimDirectories.createScimDirectory({})
      */
-    public async createScimDirectory(
+    public createScimDirectory(
         request: SSOReady.ScimDirectory,
-        requestOptions?: ScimDirectories.RequestOptions
-    ): Promise<SSOReady.CreateScimDirectoryResponse> {
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.CreateScimDirectoryResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__createScimDirectory(request, requestOptions));
+    }
+
+    private async __createScimDirectory(
+        request: SSOReady.ScimDirectory,
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.CreateScimDirectoryResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                "v1/scim-directories"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                "v1/scim-directories",
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            body: await serializers.ScimDirectory.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+            requestType: "json",
+            body: serializers.ScimDirectory.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.CreateScimDirectoryResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.CreateScimDirectoryResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -149,59 +197,80 @@ export class ScimDirectories {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling POST /v1/scim-directories.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Gets a SCIM directory.
+     *
+     * @param {string} id - The ID of the SCIM directory.
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.scimDirectories.getScimDirectory("id")
+     *     await client.management.scimDirectories.getScimDirectory("id")
      */
-    public async getScimDirectory(
+    public getScimDirectory(
         id: string,
-        requestOptions?: ScimDirectories.RequestOptions
-    ): Promise<SSOReady.GetScimDirectoryResponse> {
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.GetScimDirectoryResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__getScimDirectory(id, requestOptions));
+    }
+
+    private async __getScimDirectory(
+        id: string,
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.GetScimDirectoryResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/scim-directories/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/scim-directories/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.GetScimDirectoryResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.GetScimDirectoryResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -210,62 +279,84 @@ export class ScimDirectories {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling GET /v1/scim-directories/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Updates a SCIM directory.
+     *
+     * @param {string} id - The ID of the SCIM directory to update.
      * @param {SSOReady.ScimDirectory} request
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.scimDirectories.updateScimDirectory("id", {})
+     *     await client.management.scimDirectories.updateScimDirectory("id", {})
      */
-    public async updateScimDirectory(
+    public updateScimDirectory(
         id: string,
         request: SSOReady.ScimDirectory,
-        requestOptions?: ScimDirectories.RequestOptions
-    ): Promise<SSOReady.UpdateScimDirectoryResponse> {
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.UpdateScimDirectoryResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__updateScimDirectory(id, request, requestOptions));
+    }
+
+    private async __updateScimDirectory(
+        id: string,
+        request: SSOReady.ScimDirectory,
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.UpdateScimDirectoryResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/scim-directories/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/scim-directories/${encodeURIComponent(id)}`,
             ),
             method: "PATCH",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            body: await serializers.ScimDirectory.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+            requestType: "json",
+            body: serializers.ScimDirectory.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.UpdateScimDirectoryResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.UpdateScimDirectoryResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -274,59 +365,90 @@ export class ScimDirectories {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError("Timeout exceeded when calling PATCH /v1/scim-directories/{id}.");
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
-     * @param {string} id
+     * Rotates a SCIM directory's bearer token.
+     *
+     *  Every SCIM directory has a bearer token that SSOReady uses to authenticate requests sent from your customer's
+     *  Identity Provider. These bearer tokens are assigned by SSOReady, and are secret. Newly-created SCIM directories do
+     *  not have any bearer token at all; you must use this endpoint to get an initial value.
+     *
+     *  Rotating a SCIM directory bearer token immediately invalidates the previous bearer token, if any. Your customer
+     *  will need to update their SCIM configuration with the new value to make SCIM syncing work again.
+     *
+     *  SSOReady only stores the hash of these bearer tokens. If your customer has lost their copy, you must use this
+     *  endpoint to generate a new one.
+     *
+     * @param {string} id - The ID of the SCIM directory whose bearer token to rotate.
      * @param {ScimDirectories.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
-     *     await ssoReady.management.scimDirectories.rotateScimDirectoryBearerToken("id")
+     *     await client.management.scimDirectories.rotateScimDirectoryBearerToken("id")
      */
-    public async rotateScimDirectoryBearerToken(
+    public rotateScimDirectoryBearerToken(
         id: string,
-        requestOptions?: ScimDirectories.RequestOptions
-    ): Promise<SSOReady.RotateScimDirectoryBearerTokenResponse> {
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): core.HttpResponsePromise<SSOReady.RotateScimDirectoryBearerTokenResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__rotateScimDirectoryBearerToken(id, requestOptions));
+    }
+
+    private async __rotateScimDirectoryBearerToken(
+        id: string,
+        requestOptions?: ScimDirectories.RequestOptions,
+    ): Promise<core.WithRawResponse<SSOReady.RotateScimDirectoryBearerTokenResponse>> {
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.SSOReadyEnvironment.Default,
-                `v1/scim-directories/${encodeURIComponent(id)}/rotate-bearer-token`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.SSOReadyEnvironment.Default,
+                `v1/scim-directories/${encodeURIComponent(id)}/rotate-bearer-token`,
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "ssoready",
-                "X-Fern-SDK-Version": "1.1.0",
+                "X-Fern-SDK-Version": "1.1.1",
+                "User-Agent": "ssoready/1.1.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return await serializers.RotateScimDirectoryBearerTokenResponse.parseOrThrow(_response.body, {
-                unrecognizedObjectKeys: "passthrough",
-                allowUnrecognizedUnionMembers: true,
-                allowUnrecognizedEnumValues: true,
-                skipValidation: true,
-                breadcrumbsPrefix: ["response"],
-            });
+            return {
+                data: serializers.RotateScimDirectoryBearerTokenResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    skipValidation: true,
+                    breadcrumbsPrefix: ["response"],
+                }),
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             throw new errors.SSOReadyError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
+                rawResponse: _response.rawResponse,
             });
         }
 
@@ -335,12 +457,16 @@ export class ScimDirectories {
                 throw new errors.SSOReadyError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.SSOReadyTimeoutError();
+                throw new errors.SSOReadyTimeoutError(
+                    "Timeout exceeded when calling POST /v1/scim-directories/{id}/rotate-bearer-token.",
+                );
             case "unknown":
                 throw new errors.SSOReadyError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -349,7 +475,8 @@ export class ScimDirectories {
         const bearer = (await core.Supplier.get(this._options.apiKey)) ?? process?.env["SSOREADY_API_KEY"];
         if (bearer == null) {
             throw new errors.SSOReadyError({
-                message: "Please specify SSOREADY_API_KEY when instantiating the client.",
+                message:
+                    "Please specify a bearer by either passing it in to the constructor or initializing a SSOREADY_API_KEY environment variable",
             });
         }
 

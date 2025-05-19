@@ -9,12 +9,15 @@ import * as core from "../../core";
 export const GoogleProtobufAny: core.serialization.ObjectSchema<
     serializers.GoogleProtobufAny.Raw,
     SSOReady.GoogleProtobufAny
-> = core.serialization.object({
-    type: core.serialization.property("@type", core.serialization.string().optional()),
-});
+> = core.serialization
+    .object({
+        type: core.serialization.property("@type", core.serialization.string().optional()),
+    })
+    .passthrough();
 
 export declare namespace GoogleProtobufAny {
-    interface Raw {
+    export interface Raw {
         "@type"?: string | null;
+        [key: string]: any;
     }
 }

@@ -14,7 +14,7 @@ export const RotateScimDirectoryBearerTokenResponse: core.serialization.ObjectSc
 });
 
 export declare namespace RotateScimDirectoryBearerTokenResponse {
-    interface Raw {
+    export interface Raw {
         bearerToken?: string | null;
     }
 }

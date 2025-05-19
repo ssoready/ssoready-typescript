@@ -5,6 +5,8 @@
 import * as SSOReady from "../index";
 
 export interface ListScimUsersResponse {
+    /** List of SCIM users. */
     scimUsers?: SSOReady.ScimUser[];
+    /** Value to use as `pageToken` for the next page of data. Empty if there is no more data. */
     nextPageToken?: string;
 }

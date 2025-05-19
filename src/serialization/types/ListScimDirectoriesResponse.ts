@@ -16,7 +16,7 @@ export const ListScimDirectoriesResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace ListScimDirectoriesResponse {
-    interface Raw {
+    export interface Raw {
         scimDirectories?: ScimDirectory.Raw[] | null;
         nextPageToken?: string | null;
     }

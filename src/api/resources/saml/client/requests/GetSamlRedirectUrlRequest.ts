@@ -9,8 +9,33 @@
  *     }
  */
 export interface GetSamlRedirectUrlRequest {
+    /**
+     * The SAML connection to start a SAML login for.
+     *
+     *  One of `samlConnectionId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     samlConnectionId?: string;
+    /**
+     * The ID of the organization to start a SAML login for.
+     *
+     *  The primary SAML connection in this organization will be used for logins.
+     *
+     *  One of `samlConnectionId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     organizationId?: string;
+    /**
+     * The `externalId` of the organization to start a SAML login for.
+     *
+     *  The primary SAML connection in this organization will be used for logins.
+     *
+     *  One of `samlConnectionId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     organizationExternalId?: string;
+    /**
+     * This string will be returned back to you when you redeem this login's SAML access code.
+     *
+     *  You can do anything you like with this `state`, but the most common use-case is to keep track of where to redirect
+     *  your user back to after logging in with SAML.
+     */
     state?: string;
 }

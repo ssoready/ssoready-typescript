@@ -3,5 +3,11 @@
  */
 
 export interface RotateScimDirectoryBearerTokenResponse {
+    /**
+     * The new, updated bearer token.
+     *
+     *  Do not log or store this bearer token. It is an authentication token that your customer should securely input into
+     *  their Identity Provider.
+     */
     bearerToken?: string;
 }

@@ -9,8 +9,26 @@
  *     }
  */
 export interface ScimListScimGroupsRequest {
+    /**
+     * The SCIM directory to list from.
+     *
+     *  One of `scimDirectoryId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     scimDirectoryId?: string;
+    /**
+     * The ID of the organization to list from. The primary SCIM directory of this organization is used.
+     *
+     *  One of `scimDirectoryId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     organizationId?: string;
+    /**
+     * The `externalId` of the organization to list from. The primary SCIM directory of this organization is used.
+     *
+     *  One of `scimDirectoryId`, `organizationId`, or `organizationExternalId` must be specified.
+     */
     organizationExternalId?: string;
+    /**
+     * Pagination token. Leave empty to get the first page of results.
+     */
     pageToken?: string;
 }

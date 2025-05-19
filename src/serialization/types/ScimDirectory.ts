@@ -12,17 +12,15 @@ export const ScimDirectory: core.serialization.ObjectSchema<serializers.ScimDire
         organizationId: core.serialization.string().optional(),
         primary: core.serialization.boolean().optional(),
         scimBaseUrl: core.serialization.string().optional(),
-        clientBearerToken: core.serialization.string().optional(),
         hasClientBearerToken: core.serialization.boolean().optional(),
     });
 
 export declare namespace ScimDirectory {
-    interface Raw {
+    export interface Raw {
         id?: string | null;
         organizationId?: string | null;
         primary?: boolean | null;
         scimBaseUrl?: string | null;
-        clientBearerToken?: string | null;
         hasClientBearerToken?: boolean | null;
     }
 }

@@ -15,7 +15,7 @@ export const GetSamlConnectionResponse: core.serialization.ObjectSchema<
 });
 
 export declare namespace GetSamlConnectionResponse {
-    interface Raw {
+    export interface Raw {
         samlConnection?: SamlConnection.Raw | null;
     }
 }

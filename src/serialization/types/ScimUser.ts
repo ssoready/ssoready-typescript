@@ -16,7 +16,7 @@ export const ScimUser: core.serialization.ObjectSchema<serializers.ScimUser.Raw,
     });
 
 export declare namespace ScimUser {
-    interface Raw {
+    export interface Raw {
         id?: string | null;
         scimDirectoryId?: string | null;
         email?: string | null;
